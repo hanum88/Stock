@@ -5,9 +5,10 @@ import java.util.List;
 public class Main {
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws StockException {
 
         int[] stockLevels = {10,20,30,40,50};
+
         for (int i = 0; i < stockLevels.length; i++) {
             System.out.println(
                     "Produkt č.: " + i + " má na skladě " + stockLevels[i] + " kusů.");
@@ -15,7 +16,13 @@ public class Main {
 
         System.out.println("celkový počet kusů: " + Arrays.stream(stockLevels).sum());
 
-        System.out.println(updateStock(stockLevels, 1, 100));
+        try {
+            System.out.println(updateStock(stockLevels, 10, 100));
+        } catch (StockException e) {
+            System.out.println("Došlo k chybě: " + e.getLocalizedMessage());
+        }
+
+
 
         List<String> productNames = new ArrayList<>(Arrays.asList("Laptop","Telefon", "Monitor", "Klávesnice", "Myš"));
         productNames.add("Sluchátka");
@@ -50,19 +57,21 @@ public class Main {
         return "Položka : " + product + " nebyla nalezena";
     }
 
-    public static String updateStock (int[] inputList, int index, int newStockLevel)  {
-                if (inputList.length < index) {
-            return "Index položky je mimo rozsah pole";
+    public static String updateStock (int[] inputList, int index, int newStockLevel) throws StockException {
+        try {
+            inputList[index] = newStockLevel;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new StockException("chyba indexu: " + index + " - " + e.getLocalizedMessage());
         }
-        else {
-            String output = "";
-            inputList[index]=newStockLevel;
-                for (int i = 0; i < inputList.length; i++) {
-                    output += "Produkt č.: " + i + " má na skladě " + inputList[i] + " kusů. \n";
-                }
-                return  output;
-        }
+
+        String output = "";
+
+            for (int i = 0; i < inputList.length; i++) {
+                output += "Produkt č.: " + i + " má na skladě " + inputList[i] + " kusů. \n";
+            }
+            return output;
     }
+
 
     public static String getStockStatusByName (List<String> productNames, int[] stockLevels, String name) {
         if (productNames.contains(name)) {
